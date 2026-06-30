@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,63 +13,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'cash app',
+      title: 'Auth App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Perhatikan baris ini, kurung tutupnya sudah lengkap
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.white,
+        primaryColor: const Color(0xFF8B5CF6),
+        useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: SafeArea(
-          child: Text("flutter 1"),
-        ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          // Typo MainAxisAlignment juga sudah diperbaiki di sini
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('You have saved the money this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }
