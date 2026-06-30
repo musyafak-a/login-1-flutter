@@ -380,8 +380,9 @@ class _StatistikScreenState extends State<StatistikScreen> {
 
   Color _intensityColor(int intensity) {
     if (intensity <= 0) return Colors.grey.shade100;
-    if (intensity == 1) return AppColors.primaryLight.withOpacity(0.6);
-    if (intensity == 2) return AppColors.primary.withOpacity(0.75);
+    if (intensity == 1) return AppColors.primary.withOpacity(0.3);
+    if (intensity == 2) return AppColors.primary.withOpacity(0.6);
+    if (intensity == 3) return AppColors.primary.withOpacity(0.85);
     return AppColors.primaryDark;
   }
 
@@ -392,8 +393,9 @@ class _StatistikScreenState extends State<StatistikScreen> {
         const Text('Less', style: TextStyle(fontSize: 10, color: Colors.black45)),
         const SizedBox(width: 6),
         _legendBox(Colors.grey.shade100),
-        _legendBox(AppColors.primaryLight.withOpacity(0.6)),
-        _legendBox(AppColors.primary.withOpacity(0.75)),
+        _legendBox(AppColors.primary.withOpacity(0.3)),
+        _legendBox(AppColors.primary.withOpacity(0.6)),
+        _legendBox(AppColors.primary.withOpacity(0.85)),
         _legendBox(AppColors.primaryDark),
         const SizedBox(width: 6),
         const Text('More', style: TextStyle(fontSize: 10, color: Colors.black45)),

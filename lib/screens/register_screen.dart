@@ -15,6 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   bool _isLoading = false;
 
@@ -106,7 +107,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   AppTextField(
                     hintText: 'Password',
                     controller: _passwordController,
-                    obscureText: true,
+                    obscureText: _obscurePassword,
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        size: 20, color: Colors.grey),
+                    suffixWidget: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 48),
                   Align(

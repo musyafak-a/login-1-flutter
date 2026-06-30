@@ -102,16 +102,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     prefixIcon: const Icon(Icons.lock_outline,
                         size: 20, color: Colors.grey),
-                    suffixWidget: TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'FORGOT',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
+                    suffixWidget: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
                       ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
                   ),
                   const SizedBox(height: 48),
