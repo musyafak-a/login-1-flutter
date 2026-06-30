@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
+import '../database/database_helper.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,9 +15,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _register() {
-    // Validasi sederhana, tanpa backend
-    Navigator.pushReplacementNamed(context, '/home');
+  bool _isLoading = false;
+
+  void _register() async {
+    final name = _nameController.text.trim();
+    final emailOrPhone = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (name.isEmpty || emailOrPhone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Semua field wajib diisi')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final error = await DatabaseHelper.instance.registerUser(
+      name: name,
+      emailOrPhone: emailOrPhone,
+      password: password,
+    );
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (error == null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
   }
 
   @override
@@ -81,8 +110,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 48),
                   Align(
                     alignment: Alignment.centerRight,
-                    child:
-                        AppPrimaryButton(label: 'Sign up', onPressed: _register),
+                    child: _isLoading
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          )
+                        : AppPrimaryButton(
+                            label: 'Sign up', onPressed: _register),
                   ),
                   const SizedBox(height: 40),
                 ],

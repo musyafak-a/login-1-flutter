@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
+import '../database/database_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,9 +15,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  void _login() {
-    // Validasi sederhana, tanpa backend
-    Navigator.pushReplacementNamed(context, '/home');
+  bool _isLoading = false;
+
+  void _login() async {
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+
+    if (phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nomor & password wajib diisi')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final user = await DatabaseHelper.instance.loginUser(
+      emailOrPhone: phone,
+      password: password,
+    );
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nomor atau password salah')),
+      );
+    }
   }
 
   @override
@@ -89,7 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 48),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: AppPrimaryButton(label: 'Login', onPressed: _login),
+                    child: _isLoading
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          )
+                        : AppPrimaryButton(label: 'Login', onPressed: _login),
                   ),
                   const SizedBox(height: 64),
                   Center(
