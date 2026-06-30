@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
-/// Header dengan gradient ungu melengkung di pojok kanan atas,
+/// Header dengan gradient oranye melengkung di pojok kanan atas,
 /// meniru desain pada referensi (curve besar di kanan).
 class GradientCurveHeader extends StatelessWidget {
   final double height;
@@ -21,7 +22,6 @@ class GradientCurveHeader extends StatelessWidget {
       width: double.infinity,
       child: Stack(
         children: [
-          // Curve gradient shape di kanan atas
           Positioned(
             top: -height * 0.35,
             right: -60,
@@ -34,8 +34,8 @@ class GradientCurveHeader extends StatelessWidget {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    const Color(0xFFC4A6F5).withOpacity(0.9),
-                    const Color(0xFFEDE3FB).withOpacity(0.3),
+                    AppColors.primaryLight.withOpacity(0.9),
+                    const Color(0xFFFFE8DC).withOpacity(0.3),
                   ],
                 ),
               ),

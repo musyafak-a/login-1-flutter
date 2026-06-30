@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
+import '../theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           'sign up',
                           style: TextStyle(
-                            color: Color(0xFF8B5CF6),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -106,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'FORGOT',
                         style: TextStyle(
-                          color: Color(0xFF8B5CF6),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
                         ),
@@ -120,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 14),
                             child: CircularProgressIndicator(
-                              color: Color(0xFF8B5CF6),
+                              color: AppColors.primary,
                             ),
                           )
                         : AppPrimaryButton(label: 'Login', onPressed: _login),

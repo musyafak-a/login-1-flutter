@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
+import '../theme/app_colors.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -86,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: const Text(
                           'sign in',
                           style: TextStyle(
-                            color: Color(0xFF8B5CF6),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -114,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 14),
                             child: CircularProgressIndicator(
-                              color: Color(0xFF8B5CF6),
+                              color: AppColors.primary,
                             ),
                           )
                         : AppPrimaryButton(

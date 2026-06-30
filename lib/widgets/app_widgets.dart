@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class AppTextField extends StatelessWidget {
   final String hintText;
@@ -44,22 +45,24 @@ class AppTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF8B5CF6), width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );
   }
 }
 
-/// Tombol utama ungu dengan icon panah di kanan, sesuai desain.
+/// Tombol utama oranye dengan icon panah di kanan, sesuai desain.
 class AppPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
+  final IconData icon;
 
   const AppPrimaryButton({
     super.key,
     required this.label,
     required this.onPressed,
+    this.icon = Icons.login_rounded,
   });
 
   @override
@@ -70,7 +73,7 @@ class AppPrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26),
           ),
@@ -94,8 +97,7 @@ class AppPrimaryButton extends StatelessWidget {
                 color: Colors.white.withOpacity(0.25),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.login_rounded,
-                  size: 14, color: Colors.white),
+              child: Icon(icon, size: 14, color: Colors.white),
             ),
           ],
         ),

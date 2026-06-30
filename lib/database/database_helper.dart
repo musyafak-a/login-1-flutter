@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -34,6 +34,28 @@ class DatabaseHelper {
             passwordHash TEXT NOT NULL
           )
         ''');
+        await db.execute('''
+          CREATE TABLE activities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            distanceKm REAL NOT NULL,
+            durationSeconds INTEGER NOT NULL,
+            paceSecondsPerKm REAL NOT NULL
+          )
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS activities (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              date TEXT NOT NULL,
+              distanceKm REAL NOT NULL,
+              durationSeconds INTEGER NOT NULL,
+              paceSecondsPerKm REAL NOT NULL
+            )
+          ''');
+        }
       },
     );
   }
@@ -100,5 +122,89 @@ class DatabaseHelper {
   Future<void> close() async {
     final db = await database;
     db.close();
+  }
+
+  // ====================== ACTIVITIES (data lari) ======================
+
+  /// Simpan satu sesi lari yang baru selesai.
+  Future<int> insertActivity({
+    required DateTime date,
+    required double distanceKm,
+    required int durationSeconds,
+  }) async {
+    final db = await database;
+    final pace = distanceKm > 0 ? durationSeconds / distanceKm : 0.0;
+
+    return await db.insert('activities', {
+      'date': date.toIso8601String(),
+      'distanceKm': distanceKm,
+      'durationSeconds': durationSeconds,
+      'paceSecondsPerKm': pace,
+    });
+  }
+
+  /// Ambil semua activity dalam rentang tanggal [start, end] (inklusif).
+  Future<List<Map<String, dynamic>>> getActivitiesBetween(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final db = await database;
+    final startStr = DateTime(start.year, start.month, start.day)
+        .toIso8601String();
+    final endStr =
+        DateTime(end.year, end.month, end.day, 23, 59, 59).toIso8601String();
+
+    return await db.query(
+      'activities',
+      where: 'date >= ? AND date <= ?',
+      whereArgs: [startStr, endStr],
+      orderBy: 'date ASC',
+    );
+  }
+
+  /// Ambil semua activity dalam 1 bulan tertentu (untuk tabel absen).
+  Future<List<Map<String, dynamic>>> getActivitiesForMonth(
+    int year,
+    int month,
+  ) async {
+    final start = DateTime(year, month, 1);
+    final end = DateTime(year, month + 1, 0); // hari terakhir bulan itu
+    return getActivitiesBetween(start, end);
+  }
+
+  /// Statistik 7 hari terakhir (untuk grafik mingguan).
+  /// Return list 7 item berurutan dari hari tertua -> terbaru,
+  /// masing-masing berisi {date, distanceKm, durationSeconds}.
+  Future<List<Map<String, dynamic>>> getWeeklyStats(DateTime referenceDate) async {
+    final today = DateTime(
+        referenceDate.year, referenceDate.month, referenceDate.day);
+    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+    final endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+    final activities = await getActivitiesBetween(startOfWeek, endOfWeek);
+
+    final List<Map<String, dynamic>> result = [];
+    for (int i = 0; i < 7; i++) {
+      final day = startOfWeek.add(Duration(days: i));
+      double totalDistance = 0;
+      int totalDuration = 0;
+
+      for (final a in activities) {
+        final aDate = DateTime.parse(a['date'] as String);
+        if (aDate.year == day.year &&
+            aDate.month == day.month &&
+            aDate.day == day.day) {
+          totalDistance += (a['distanceKm'] as num).toDouble();
+          totalDuration += (a['durationSeconds'] as num).toInt();
+        }
+      }
+
+      result.add({
+        'date': day,
+        'distanceKm': totalDistance,
+        'durationSeconds': totalDuration,
+      });
+    }
+    return result;
   }
 }
