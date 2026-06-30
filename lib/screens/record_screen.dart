@@ -23,11 +23,47 @@ class _RecordScreenState extends State<RecordScreen> {
   _RunState _state = _RunState.idle;
   final List<LatLng> _routePoints = [];
   LatLng? _currentPosition;
+  bool _isLocating = true; // true saat pertama kali mencari lokasi
 
   double _distanceMeters = 0;
   int _elapsedSeconds = 0;
 
-  static const LatLng _defaultCenter = LatLng(-6.9667, 110.4167); // Semarang
+  @override
+  void initState() {
+    super.initState();
+    _initLocation();
+  }
+
+  /// Ambil posisi GPS saat halaman pertama kali dibuka,
+  /// lalu pusatkan peta ke lokasi nyata perangkat.
+  Future<void> _initLocation() async {
+    final granted = await _ensurePermission();
+    if (!granted) {
+      if (mounted) setState(() => _isLocating = false);
+      return;
+    }
+
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+      if (mounted) {
+        final point = LatLng(pos.latitude, pos.longitude);
+        setState(() {
+          _currentPosition = point;
+          _isLocating = false;
+        });
+        // Pindahkan peta ke lokasi asli perangkat
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _mapController.move(point, 16);
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLocating = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -91,8 +127,8 @@ class _RecordScreenState extends State<RecordScreen> {
     });
 
     const settings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 3, // update tiap pergerakan >= 3 meter
+      accuracy: LocationAccuracy.high,   // pakai mode akurasi tinggi (GPS, bukan cuma wifi/cell tower)
+      distanceFilter: 3,                 // update posisi tiap pergerakan ≥ 3 meter
     );
 
     _positionStream =
@@ -174,14 +210,16 @@ class _RecordScreenState extends State<RecordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Gunakan posisi perangkat jika sudah didapat, atau fallback ke dunia tengah
+    final initialCenter = _currentPosition ?? const LatLng(0, 0);
     return Container(
       color: Colors.white,
       child: Stack(
         children: [
           FlutterMap(
             mapController: _mapController,
-            options: const MapOptions(
-              initialCenter: _defaultCenter,
+            options: MapOptions(
+              initialCenter: initialCenter,
               initialZoom: 16,
             ),
             children: [
@@ -218,6 +256,24 @@ class _RecordScreenState extends State<RecordScreen> {
                 ),
             ],
           ),
+          // Overlay loading saat pertama kali mencari lokasi
+          if (_isLocating)
+            Container(
+              color: Colors.black26,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 12),
+                    Text(
+                      'Mendapatkan lokasi GPS...',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
