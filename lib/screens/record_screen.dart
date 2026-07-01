@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
+import '../state/app_state.dart';
 
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
@@ -166,7 +167,9 @@ class _RecordScreenState extends State<RecordScreen> {
     final distanceKm = _distanceMeters / 1000;
 
     if (distanceKm > 0.01) {
+      final userId = AppState.currentUserId ?? 0;
       await DatabaseHelper.instance.insertActivity(
+        userId: userId,
         date: DateTime.now(),
         distanceKm: distanceKm,
         durationSeconds: _elapsedSeconds,

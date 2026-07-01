@@ -3,6 +3,7 @@ import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
+import '../state/app_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nomor & password wajib diisi')),
+        const SnackBar(content: Text('Email/Nomor & password wajib diisi')),
       );
       return;
     }
@@ -39,10 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (user != null) {
+      AppState.currentUserId = user.id;
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nomor atau password salah')),
+        const SnackBar(content: Text('Email/Nomor atau password salah')),
       );
     }
   }
@@ -91,9 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
                   AppTextField(
-                    hintText: '+1',
+                    hintText: 'Email / Nomor HP',
                     controller: _phoneController,
-                    keyboardType: TextInputType.phone,
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   AppTextField(

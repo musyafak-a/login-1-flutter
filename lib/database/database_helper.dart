@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -37,6 +37,7 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE activities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userId INTEGER NOT NULL,
             date TEXT NOT NULL,
             distanceKm REAL NOT NULL,
             durationSeconds INTEGER NOT NULL,
@@ -56,6 +57,9 @@ class DatabaseHelper {
             )
           ''');
         }
+        if (oldVersion < 3) {
+          await db.execute('ALTER TABLE activities ADD COLUMN userId INTEGER NOT NULL DEFAULT 0');
+        }
       },
     );
   }
@@ -67,9 +71,9 @@ class DatabaseHelper {
     return digest.toString();
   }
 
-  /// Daftarkan user baru. Return null jika sukses,
-  /// atau pesan error (mis. email/phone sudah terdaftar).
-  Future<String?> registerUser({
+  /// Daftarkan user baru. Return UserModel jika sukses,
+  /// atau pesan error (String) jika gagal.
+  Future<dynamic> registerUser({
     required String name,
     required String emailOrPhone,
     required String password,
@@ -91,12 +95,17 @@ class DatabaseHelper {
       passwordHash: hashPassword(password),
     );
 
-    await db.insert(
+    final id = await db.insert(
       'users',
       user.toMap()..remove('id'),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return null; // sukses
+    return UserModel(
+      id: id,
+      name: user.name,
+      emailOrPhone: user.emailOrPhone,
+      passwordHash: user.passwordHash,
+    );
   }
 
   /// Cek login. Return UserModel jika cocok, null jika gagal.
@@ -128,6 +137,7 @@ class DatabaseHelper {
 
   /// Simpan satu sesi lari yang baru selesai.
   Future<int> insertActivity({
+    required int userId,
     required DateTime date,
     required double distanceKm,
     required int durationSeconds,
@@ -136,6 +146,7 @@ class DatabaseHelper {
     final pace = distanceKm > 0 ? durationSeconds / distanceKm : 0.0;
 
     return await db.insert('activities', {
+      'userId': userId,
       'date': date.toIso8601String(),
       'distanceKm': distanceKm,
       'durationSeconds': durationSeconds,
@@ -145,6 +156,7 @@ class DatabaseHelper {
 
   /// Ambil semua activity dalam rentang tanggal [start, end] (inklusif).
   Future<List<Map<String, dynamic>>> getActivitiesBetween(
+    int userId,
     DateTime start,
     DateTime end,
   ) async {
@@ -156,32 +168,33 @@ class DatabaseHelper {
 
     return await db.query(
       'activities',
-      where: 'date >= ? AND date <= ?',
-      whereArgs: [startStr, endStr],
+      where: 'userId = ? AND date >= ? AND date <= ?',
+      whereArgs: [userId, startStr, endStr],
       orderBy: 'date ASC',
     );
   }
 
   /// Ambil semua activity dalam 1 bulan tertentu (untuk tabel absen).
   Future<List<Map<String, dynamic>>> getActivitiesForMonth(
+    int userId,
     int year,
     int month,
   ) async {
     final start = DateTime(year, month, 1);
     final end = DateTime(year, month + 1, 0); // hari terakhir bulan itu
-    return getActivitiesBetween(start, end);
+    return getActivitiesBetween(userId, start, end);
   }
 
   /// Statistik 7 hari terakhir (untuk grafik mingguan).
   /// Return list 7 item berurutan dari hari tertua -> terbaru,
   /// masing-masing berisi {date, distanceKm, durationSeconds}.
-  Future<List<Map<String, dynamic>>> getWeeklyStats(DateTime referenceDate) async {
+  Future<List<Map<String, dynamic>>> getWeeklyStats(int userId, DateTime referenceDate) async {
     final today = DateTime(
         referenceDate.year, referenceDate.month, referenceDate.day);
     final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
     final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
-    final activities = await getActivitiesBetween(startOfWeek, endOfWeek);
+    final activities = await getActivitiesBetween(userId, startOfWeek, endOfWeek);
 
     final List<Map<String, dynamic>> result = [];
     for (int i = 0; i < 7; i++) {

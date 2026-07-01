@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
+import '../state/app_state.dart';
 
 class StatistikScreen extends StatefulWidget {
   const StatistikScreen({super.key});
@@ -24,9 +25,10 @@ class _StatistikScreenState extends State<StatistikScreen> {
   }
 
   Future<void> _loadData() async {
-    final weekly = await DatabaseHelper.instance.getWeeklyStats(DateTime.now());
+    final userId = AppState.currentUserId ?? 0;
+    final weekly = await DatabaseHelper.instance.getWeeklyStats(userId, DateTime.now());
     final monthly = await DatabaseHelper.instance
-        .getActivitiesForMonth(_selectedMonth.year, _selectedMonth.month);
+        .getActivitiesForMonth(userId, _selectedMonth.year, _selectedMonth.month);
     if (mounted) {
       setState(() {
         _weeklyStats = weekly;

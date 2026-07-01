@@ -3,6 +3,7 @@ import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
+import '../state/app_state.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -41,7 +42,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!mounted) return;
 
-    if (error == null) {
+    if (error is! String) {
+      // error contains UserModel if success
+      AppState.currentUserId = error.id;
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
