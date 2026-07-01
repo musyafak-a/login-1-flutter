@@ -22,6 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadOverview();
+    AppState.refreshNotifier.addListener(_loadOverview);
+  }
+
+  @override
+  void dispose() {
+    AppState.refreshNotifier.removeListener(_loadOverview);
+    super.dispose();
   }
 
   Future<void> _loadOverview() async {

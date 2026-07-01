@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -170,13 +171,22 @@ class _RecordScreenState extends State<RecordScreen> {
     // Minimum jarak untuk disimpan: 2 meter (0.002 km)
     if (distanceKm > 0.002) {
       final userId = AppState.currentUserId ?? 0;
+      
+      // Serialize route points
+      final routeList = _routePoints.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList();
+      final routeJson = jsonEncode(routeList);
+
       await DatabaseHelper.instance.insertActivity(
         userId: userId,
         sportType: _selectedSport,
         date: DateTime.now(),
         distanceKm: distanceKm,
         durationSeconds: _elapsedSeconds,
+        route: routeJson,
       );
+      
+      AppState.refreshNotifier.value++; // Trigger UI refresh for other tabs
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

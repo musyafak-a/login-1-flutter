@@ -22,6 +22,13 @@ class _StatistikScreenState extends State<StatistikScreen> {
   void initState() {
     super.initState();
     _loadData();
+    AppState.refreshNotifier.addListener(_loadData);
+  }
+
+  @override
+  void dispose() {
+    AppState.refreshNotifier.removeListener(_loadData);
+    super.dispose();
   }
 
   Future<void> _loadData() async {

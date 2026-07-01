@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -42,7 +42,8 @@ class DatabaseHelper {
             date TEXT NOT NULL,
             distanceKm REAL NOT NULL,
             durationSeconds INTEGER NOT NULL,
-            paceSecondsPerKm REAL NOT NULL
+            paceSecondsPerKm REAL NOT NULL,
+            route TEXT NOT NULL
           )
         ''');
       },
@@ -63,6 +64,9 @@ class DatabaseHelper {
         }
         if (oldVersion < 4) {
           await db.execute("ALTER TABLE activities ADD COLUMN sportType TEXT NOT NULL DEFAULT 'Lari'");
+        }
+        if (oldVersion < 5) {
+          await db.execute("ALTER TABLE activities ADD COLUMN route TEXT NOT NULL DEFAULT '[]'");
         }
       },
     );
@@ -146,6 +150,7 @@ class DatabaseHelper {
     required DateTime date,
     required double distanceKm,
     required int durationSeconds,
+    required String route,
   }) async {
     final db = await database;
     final pace = distanceKm > 0 ? durationSeconds / distanceKm : 0.0;
@@ -157,7 +162,18 @@ class DatabaseHelper {
       'distanceKm': distanceKm,
       'durationSeconds': durationSeconds,
       'paceSecondsPerKm': pace,
+      'route': route,
     });
+  }
+
+  /// Hapus activity berdasarkan id
+  Future<int> deleteActivity(int id) async {
+    final db = await database;
+    return await db.delete(
+      'activities',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   /// Ambil semua activity dalam rentang tanggal [start, end] (inklusif).
@@ -289,5 +305,16 @@ class DatabaseHelper {
       'streak': streak,
       'favorite': favorite, 
     };
+  }
+
+  /// Ambil semua history beserta rutenya untuk ditampilkan di halaman History
+  Future<List<Map<String, dynamic>>> getAllActivitiesWithRoute(int userId) async {
+    final db = await database;
+    return await db.query(
+      'activities',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'date DESC',
+    );
   }
 }

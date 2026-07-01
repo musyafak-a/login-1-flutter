@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'record_screen.dart';
+import 'history_screen.dart';
 import 'statistik_screen.dart';
 import '../widgets/app_bottom_nav.dart';
 
@@ -17,6 +18,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _pages = const [
     HomeScreen(),
     RecordScreen(),
+    HistoryScreen(),
     StatistikScreen(),
   ];
 

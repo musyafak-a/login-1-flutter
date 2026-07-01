@@ -43,7 +43,7 @@ class AppBottomNav extends StatelessWidget {
             height: 75,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final tabWidth = constraints.maxWidth / 3;
+                final tabWidth = constraints.maxWidth / 4;
                 final circleSize = 56.0;
                 final leftPosition = (tabWidth * currentIndex) + (tabWidth - circleSize) / 2;
 
@@ -88,7 +88,8 @@ class AppBottomNav extends StatelessWidget {
               children: [
                 _navItem(Icons.home_rounded, 'Home', 0),
                 _navItem(Icons.directions_run_rounded, 'Record', 1),
-                _navItem(Icons.bar_chart_rounded, 'Statistik', 2),
+                _navItem(Icons.history_rounded, 'History', 2),
+                _navItem(Icons.bar_chart_rounded, 'Statistik', 3),
               ],
             ),
           ),
