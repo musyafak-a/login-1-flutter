@@ -28,6 +28,7 @@ class _RecordScreenState extends State<RecordScreen> {
 
   double _distanceMeters = 0;
   int _elapsedSeconds = 0;
+  String _selectedSport = 'Lari';
 
   @override
   void initState() {
@@ -171,6 +172,7 @@ class _RecordScreenState extends State<RecordScreen> {
       final userId = AppState.currentUserId ?? 0;
       await DatabaseHelper.instance.insertActivity(
         userId: userId,
+        sportType: _selectedSport,
         date: DateTime.now(),
         distanceKm: distanceKm,
         durationSeconds: _elapsedSeconds,
@@ -179,7 +181,7 @@ class _RecordScreenState extends State<RecordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Lari tersimpan: ${distanceKm.toStringAsFixed(2)} km'),
+                '$_selectedSport tersimpan: ${distanceKm.toStringAsFixed(2)} km'),
           ),
         );
       }
@@ -315,6 +317,7 @@ class _RecordScreenState extends State<RecordScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (_state == _RunState.idle) _buildSportSelector(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -454,6 +457,50 @@ class _RecordScreenState extends State<RecordScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSportSelector() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Jenis Olahraga:',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.black54,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            height: 36,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: DropdownButton<String>(
+              value: _selectedSport,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+              underline: const SizedBox(),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+                fontSize: 14,
+              ),
+              items: ['Lari', 'Sepeda', 'Jalan']
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedSport = val);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

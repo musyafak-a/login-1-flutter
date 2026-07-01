@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -38,6 +38,7 @@ class DatabaseHelper {
           CREATE TABLE activities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userId INTEGER NOT NULL,
+            sportType TEXT NOT NULL,
             date TEXT NOT NULL,
             distanceKm REAL NOT NULL,
             durationSeconds INTEGER NOT NULL,
@@ -59,6 +60,9 @@ class DatabaseHelper {
         }
         if (oldVersion < 3) {
           await db.execute('ALTER TABLE activities ADD COLUMN userId INTEGER NOT NULL DEFAULT 0');
+        }
+        if (oldVersion < 4) {
+          await db.execute("ALTER TABLE activities ADD COLUMN sportType TEXT NOT NULL DEFAULT 'Lari'");
         }
       },
     );
@@ -138,6 +142,7 @@ class DatabaseHelper {
   /// Simpan satu sesi lari yang baru selesai.
   Future<int> insertActivity({
     required int userId,
+    required String sportType,
     required DateTime date,
     required double distanceKm,
     required int durationSeconds,
@@ -147,6 +152,7 @@ class DatabaseHelper {
 
     return await db.insert('activities', {
       'userId': userId,
+      'sportType': sportType,
       'date': date.toIso8601String(),
       'distanceKm': distanceKm,
       'durationSeconds': durationSeconds,
@@ -219,5 +225,69 @@ class DatabaseHelper {
       });
     }
     return result;
+  }
+
+  /// Get user overview: records today, streak, and favorite sport
+  Future<Map<String, dynamic>> getUserOverview(int userId) async {
+    final db = await database;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayStr = today.toIso8601String();
+    
+    // 1. Jumlah record hari ini
+    final todayRecords = await db.query(
+      'activities',
+      where: 'userId = ? AND date >= ?',
+      whereArgs: [userId, todayStr],
+    );
+    final todayCount = todayRecords.length;
+
+    // 2. Streak hari olahraga & Olahraga Favorit
+    final allActivities = await db.query(
+      'activities',
+      columns: ['date', 'sportType'],
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'date DESC',
+    );
+    
+    Set<String> uniqueDays = {};
+    Map<String, int> sportCounts = {};
+    for (var a in allActivities) {
+       final d = DateTime.parse(a['date'] as String);
+       uniqueDays.add(DateTime(d.year, d.month, d.day).toIso8601String());
+       
+       final sport = a['sportType'] as String? ?? 'Lari';
+       sportCounts[sport] = (sportCounts[sport] ?? 0) + 1;
+    }
+    
+    int streak = 0;
+    DateTime checkDate = today;
+    
+    if (!uniqueDays.contains(checkDate.toIso8601String())) {
+      if (uniqueDays.contains(checkDate.subtract(const Duration(days: 1)).toIso8601String())) {
+         checkDate = checkDate.subtract(const Duration(days: 1));
+      }
+    }
+    
+    while(uniqueDays.contains(checkDate.toIso8601String())) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    }
+    
+    String favorite = 'Lari';
+    int maxCount = 0;
+    sportCounts.forEach((key, value) {
+      if (value > maxCount) {
+        maxCount = value;
+        favorite = key;
+      }
+    });
+
+    return {
+      'todayCount': todayCount,
+      'streak': streak,
+      'favorite': favorite, 
+    };
   }
 }
