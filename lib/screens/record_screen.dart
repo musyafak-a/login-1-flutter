@@ -166,7 +166,8 @@ class _RecordScreenState extends State<RecordScreen> {
 
     final distanceKm = _distanceMeters / 1000;
 
-    if (distanceKm > 0.01) {
+    // Minimum jarak untuk disimpan: 2 meter (0.002 km)
+    if (distanceKm > 0.002) {
       final userId = AppState.currentUserId ?? 0;
       await DatabaseHelper.instance.insertActivity(
         userId: userId,

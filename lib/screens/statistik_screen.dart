@@ -322,6 +322,11 @@ class _StatistikScreenState extends State<StatistikScreen> {
     final totalCells = leadingEmpty + daysInMonth;
     final rows = (totalCells / 7).ceil();
 
+    int maxIntensity = 1;
+    for (var val in intensityByDay.values) {
+      if (val > maxIntensity) maxIntensity = val;
+    }
+
     return Column(
       children: [
         const Row(
@@ -347,30 +352,41 @@ class _StatistikScreenState extends State<StatistikScreen> {
                 final intensity =
                     isValidDay ? (intensityByDay[dayNumber] ?? 0) : 0;
 
+                Widget cell = Container(
+                  margin: const EdgeInsets.all(2),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: !isValidDay
+                        ? Colors.transparent
+                        : _intensityColor(intensity, maxIntensity),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: isValidDay
+                      ? Text(
+                          '$dayNumber',
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: intensity > 0
+                                ? Colors.white
+                                : Colors.black45,
+                          ),
+                        )
+                      : null,
+                );
+
+                if (isValidDay) {
+                  cell = Tooltip(
+                    message: '$intensity aktivitas',
+                    triggerMode: TooltipTriggerMode.longPress,
+                    preferBelow: false,
+                    child: cell,
+                  );
+                }
+
                 return Expanded(
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: Container(
-                      margin: const EdgeInsets.all(2),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: !isValidDay
-                            ? Colors.transparent
-                            : _intensityColor(intensity),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: isValidDay
-                          ? Text(
-                              '$dayNumber',
-                              style: TextStyle(
-                                fontSize: 9,
-                                color: intensity > 0
-                                    ? Colors.white
-                                    : Colors.black45,
-                              ),
-                            )
-                          : null,
-                    ),
+                    child: cell,
                   ),
                 );
               }),
@@ -380,12 +396,13 @@ class _StatistikScreenState extends State<StatistikScreen> {
     );
   }
 
-  Color _intensityColor(int intensity) {
+  Color _intensityColor(int intensity, int maxIntensity) {
     if (intensity <= 0) return Colors.grey.shade100;
-    if (intensity == 1) return AppColors.primary.withOpacity(0.3);
-    if (intensity == 2) return AppColors.primary.withOpacity(0.6);
-    if (intensity == 3) return AppColors.primary.withOpacity(0.85);
-    return AppColors.primaryDark;
+    if (maxIntensity < 4) maxIntensity = 4; // minimum threshold for dynamic scaling
+    double ratio = intensity / maxIntensity;
+    double opacity = 0.2 + (0.8 * ratio);
+    if (opacity > 1.0) opacity = 1.0;
+    return AppColors.primary.withOpacity(opacity);
   }
 
   Widget _buildLegend() {
@@ -394,11 +411,11 @@ class _StatistikScreenState extends State<StatistikScreen> {
       children: [
         const Text('Less', style: TextStyle(fontSize: 10, color: Colors.black45)),
         const SizedBox(width: 6),
-        _legendBox(Colors.grey.shade100),
-        _legendBox(AppColors.primary.withOpacity(0.3)),
-        _legendBox(AppColors.primary.withOpacity(0.6)),
-        _legendBox(AppColors.primary.withOpacity(0.85)),
-        _legendBox(AppColors.primaryDark),
+        _legendBox(_intensityColor(0, 4)),
+        _legendBox(_intensityColor(1, 4)),
+        _legendBox(_intensityColor(2, 4)),
+        _legendBox(_intensityColor(3, 4)),
+        _legendBox(_intensityColor(4, 4)),
         const SizedBox(width: 6),
         const Text('More', style: TextStyle(fontSize: 10, color: Colors.black45)),
       ],
