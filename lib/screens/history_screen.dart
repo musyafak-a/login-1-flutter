@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -128,7 +129,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -475,14 +476,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                           title: const Text('Hapus Aktivitas',
                                               style: TextStyle(color: Colors.red)),
                                           onTap: () async {
-                                            Navigator.pop(context);
+                                            final nav = Navigator.of(context);
+                                            final sm = ScaffoldMessenger.of(context);
+                                            nav.pop();
                                             await DatabaseHelper.instance
                                                 .deleteActivity(activity['id']);
                                             if (mounted) {
                                               AppState.refreshNotifier.value++;
-                                              Navigator.pop(context);
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
+                                              nav.pop();
+                                              sm.showSnackBar(
                                                 const SnackBar(
                                                     content: Text(
                                                         'Aktivitas berhasil dihapus')),
@@ -518,7 +520,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     ));
   }
 
-  /// Tampilkan overlay screenshot bergaya gelap, capture, lalu simpan ke galeri
+  /// Capture dan simpan gambar ke galeri — gunakan CustomPainter (tanpa network)
   Future<void> _captureAndSave(
     BuildContext context,
     ScreenshotController screenshotController,
@@ -530,9 +532,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   ) async {
     final messenger = ScaffoldMessenger.of(context);
     try {
-      // Buat widget screenshot secara off-screen
       final sc = ScreenshotController();
-      final bytes = await sc.captureFromLongWidget(
+      final bytes = await sc.captureFromWidget(
         _buildDownloadWidget(
           routePoints: routePoints,
           sportType: sportType,
@@ -540,7 +541,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           durationSeconds: durationSeconds,
           pace: pace,
         ),
-        delay: const Duration(milliseconds: 300),
+        pixelRatio: 3.0,
       );
       await Gal.putImageBytes(bytes);
       if (mounted) {
@@ -557,7 +558,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  /// Widget bergaya Strava gelap — khusus untuk di-screenshot dan disimpan
+  /// Widget share card — menggambar rute dengan CustomPainter (tanpa FlutterMap/network)
   Widget _buildDownloadWidget({
     required List<LatLng> routePoints,
     required String sportType,
@@ -569,43 +570,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
       width: 390,
       height: 844,
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          // Map Background
+          // ── Background peta abu-abu muda ──
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFEAE8E3), Color(0xFFD4D0C8)],
+              ),
+            ),
+          ),
+
+          // ── Gambar rute dengan CustomPainter ──
           Positioned.fill(
-            child: routePoints.isEmpty
-                ? Container(
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                        child: Icon(Icons.map, color: Colors.grey, size: 60)),
+            child: routePoints.length >= 2
+                ? CustomPaint(
+                    painter: _RoutePainter(routePoints),
                   )
-                : FlutterMap(
-                    options: MapOptions(
-                      initialCameraFit: CameraFit.bounds(
-                        bounds: LatLngBounds.fromPoints(routePoints),
-                        padding: const EdgeInsets.all(60),
-                      ),
-                      interactionOptions: const InteractionOptions(
-                          flags: InteractiveFlag.none),
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.example.flutter_auth_app',
-                      ),
-                      PolylineLayer(
-                        polylines: [
-                          Polyline(
-                            points: routePoints,
-                            color: Colors.deepOrange,
-                            strokeWidth: 6,
-                          ),
-                        ],
-                      ),
-                    ],
+                : const Center(
+                    child: Icon(Icons.map_outlined,
+                        color: Colors.grey, size: 80),
                   ),
           ),
-          // Gradient + Stats Overlay
+
+          // ── Gradient gelap + Stats ──
           Positioned(
             left: 0,
             right: 0,
@@ -618,8 +608,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.5),
-                    Colors.black.withValues(alpha: 0.85),
+                    Colors.black.withValues(alpha: 0.55),
+                    Colors.black.withValues(alpha: 0.88),
                   ],
                 ),
               ),
@@ -666,8 +656,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _stravaStatItem('Jarak',
-                      '${distanceKm.toStringAsFixed(2)} km',
+                  _stravaStatItem(
+                      'Jarak', '${distanceKm.toStringAsFixed(2)} km',
                       isLarge: true),
                 ],
               ),
@@ -738,4 +728,88 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ],
     );
   }
+}
+
+/// CustomPainter untuk menggambar polyline rute tanpa FlutterMap/network
+class _RoutePainter extends CustomPainter {
+  final List<LatLng> routePoints;
+
+  _RoutePainter(this.routePoints);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (routePoints.length < 2) return;
+
+    // Hitung batas koordinat
+    double minLat = routePoints.map((p) => p.latitude).reduce(
+        (a, b) => a < b ? a : b);
+    double maxLat = routePoints.map((p) => p.latitude).reduce(
+        (a, b) => a > b ? a : b);
+    double minLng = routePoints.map((p) => p.longitude).reduce(
+        (a, b) => a < b ? a : b);
+    double maxLng = routePoints.map((p) => p.longitude).reduce(
+        (a, b) => a > b ? a : b);
+
+    // Tambahkan padding 15%
+    final double latRange = (maxLat - minLat).abs();
+    final double lngRange = (maxLng - minLng).abs();
+    final double latPad = latRange * 0.15 + 0.0001;
+    final double lngPad = lngRange * 0.15 + 0.0001;
+
+    minLat -= latPad;
+    maxLat += latPad;
+    minLng -= lngPad;
+    maxLng += lngPad;
+
+    // Konversi koordinat geografis ke piksel canvas
+    Offset toOffset(LatLng p) {
+      final x = (p.longitude - minLng) / (maxLng - minLng) * size.width;
+      // Latitude terbalik (Y semakin besar ke bawah)
+      final y = (1 - (p.latitude - minLat) / (maxLat - minLat)) * size.height;
+      return Offset(x, y);
+    }
+
+    // Gambar shadow rute
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    final routePath = ui.Path();
+    routePath.moveTo(toOffset(routePoints[0]).dx, toOffset(routePoints[0]).dy);
+    for (int i = 1; i < routePoints.length; i++) {
+      routePath.lineTo(toOffset(routePoints[i]).dx, toOffset(routePoints[i]).dy);
+    }
+    canvas.drawPath(routePath, shadowPaint);
+
+    // Gambar rute utama (oranye)
+    final routePaint = Paint()
+      ..color = Colors.deepOrange
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawPath(routePath, routePaint);
+
+    // Titik start (hijau)
+    final startOffset = toOffset(routePoints.first);
+    canvas.drawCircle(startOffset, 8,
+        Paint()..color = Colors.green.shade600);
+    canvas.drawCircle(startOffset, 5,
+        Paint()..color = Colors.white);
+
+    // Titik finish (merah)
+    final endOffset = toOffset(routePoints.last);
+    canvas.drawCircle(endOffset, 8,
+        Paint()..color = Colors.red.shade700);
+    canvas.drawCircle(endOffset, 5,
+        Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RoutePainter oldDelegate) =>
+      oldDelegate.routePoints != routePoints;
 }
