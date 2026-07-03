@@ -148,7 +148,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.white.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -312,7 +312,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   polylines: [
                                     Polyline(
                                       points: routePoints,
-                                      color: Colors.deepOrange,
+                                      color: AppColors.primary,
                                       strokeWidth: 5,
                                     ),
                                   ],
