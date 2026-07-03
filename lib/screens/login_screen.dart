@@ -53,10 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent, // Transparan agar terlihat GrainyBackground
-      body: GrainyBackground(
-        child: SingleChildScrollView(
+    return GrainyBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent, // Transparan agar terlihat GrainyBackground
+        body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -79,15 +79,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   else
                     _buildOverviewCard(),
                   const Spacer(),
-                  SizedBox(
+                  Container(
                     width: double.infinity,
                     height: 52,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(26),
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.gradGreen.withValues(alpha: 0.6),
+                          AppColors.gradYellow.withValues(alpha: 0.6),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(2), // Ketebalan border tipis
                     child: ElevatedButton.icon(
                       onPressed: () => _logout(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.gradYellow,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(26),
+                          borderRadius: BorderRadius.circular(24),
                         ),
                         elevation: 0,
                       ),
