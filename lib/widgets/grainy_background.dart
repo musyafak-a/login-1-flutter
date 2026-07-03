@@ -11,16 +11,43 @@ class GrainyBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Latar belakang gradasi Kuning -> Hijau
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.gradYellow,
-                AppColors.gradGreen,
-              ],
+        // Base Teal
+        Container(color: AppColors.gradGreen),
+        // Blob Kuning Kanan Atas
+        Positioned(
+          top: -200,
+          right: -150,
+          child: Container(
+            width: 500,
+            height: 600,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  AppColors.gradYellow.withValues(alpha: 0.9),
+                  AppColors.gradYellow.withValues(alpha: 0.0),
+                ],
+                stops: const [0.2, 1.0],
+              ),
+            ),
+          ),
+        ),
+        // Blob Kuning Kiri Bawah
+        Positioned(
+          bottom: -200,
+          left: -150,
+          child: Container(
+            width: 600,
+            height: 600,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  AppColors.gradYellow.withValues(alpha: 0.9),
+                  AppColors.gradYellow.withValues(alpha: 0.0),
+                ],
+                stops: const [0.3, 1.0],
+              ),
             ),
           ),
         ),

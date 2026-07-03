@@ -426,18 +426,18 @@ class _RecordScreenState extends State<RecordScreen> {
         child: ElevatedButton.icon(
           onPressed: _start,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.gradYellow,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(26),
             ),
             elevation: 0,
           ),
-          icon: const Icon(Icons.fiber_manual_record, color: Colors.white),
+          icon: const Icon(Icons.fiber_manual_record, color: AppColors.primaryDark),
           label: const Text(
             'Record',
             style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+              color: AppColors.primaryDark,
+              fontWeight: FontWeight.w700,
               fontSize: 15,
             ),
           ),
@@ -499,18 +499,18 @@ class _RecordScreenState extends State<RecordScreen> {
             child: ElevatedButton.icon(
               onPressed: _stop,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.gradYellow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
                 ),
                 elevation: 0,
               ),
-              icon: const Icon(Icons.stop_rounded, color: Colors.white),
+              icon: const Icon(Icons.stop_rounded, color: AppColors.primaryDark),
               label: const Text(
                 'Selesai',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),

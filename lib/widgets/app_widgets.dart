@@ -73,7 +73,7 @@ class AppPrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.gradYellow,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26),
           ),
@@ -85,8 +85,8 @@ class AppPrimaryButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+                color: AppColors.primaryDark,
+                fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),
             ),
@@ -94,10 +94,10 @@ class AppPrimaryButton extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
+                color: AppColors.primaryDark.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Icon(icon, size: 14, color: Colors.white),
+              child: Icon(icon, size: 14, color: AppColors.primaryDark),
             ),
           ],
         ),

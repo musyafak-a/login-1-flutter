@@ -44,7 +44,7 @@ class AppBottomNav extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final tabWidth = constraints.maxWidth / 4;
-                final circleSize = 56.0;
+                const circleSize = 56.0;
                 final leftPosition = (tabWidth * currentIndex) + (tabWidth - circleSize) / 2;
 
                 return Stack(
@@ -64,7 +64,7 @@ class AppBottomNav extends StatelessWidget {
                           border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.4),
+                              color: AppColors.primary.withValues(alpha: 0.4),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             )
