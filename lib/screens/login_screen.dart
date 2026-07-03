@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       AppState.currentUserId = user.id;
+      AppState.currentUserName = user.name;
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

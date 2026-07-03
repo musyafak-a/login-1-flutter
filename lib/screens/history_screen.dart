@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:gal/gal.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
@@ -234,207 +236,279 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _showHistoryDetail(Map<String, dynamic> activity, List<LatLng> routePoints) {
-    final date = DateTime.parse(activity['date'] as String);
     final distanceKm = activity['distanceKm'] as double;
     final durationSeconds = activity['durationSeconds'] as int;
     final pace = activity['paceSecondsPerKm'] as double;
     final sportType = activity['sportType'] as String;
+    final date = DateTime.parse(activity['date'] as String);
+
+    final screenshotController = ScreenshotController();
+
+    // Estimasi elevasi (0 karena tidak ada data GPS elevation)
+    const int elevationGain = 0;
+    const int maxElevation = 90;
+
+    final userName = AppState.currentUserName ?? 'Pengguna';
+    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'U';
+
+    // Format tanggal mirip Strava: "01 Juli 2026 pu13ul 13.49"
+    final dateStr = DateFormat("dd MMMM yyyy • HH.mm", 'id_ID').format(date);
 
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) {
         return Scaffold(
           backgroundColor: Colors.white,
-          body: Column(
+          body: Stack(
             children: [
-              // Top half: Map
-              Expanded(
-                flex: 5,
-                child: Stack(
-                  children: [
-                    routePoints.isEmpty
-                        ? Container(
-                            color: Colors.grey.shade200,
-                            child: const Center(
-                              child: Icon(Icons.map, color: Colors.grey, size: 60),
-                            ),
-                          )
-                        : FlutterMap(
-                            options: MapOptions(
-                              initialCameraFit: CameraFit.bounds(
-                                bounds: LatLngBounds.fromPoints(routePoints),
-                                padding: const EdgeInsets.all(40),
+              // ─── Konten Detail (scrollable) ───
+              CustomScrollView(
+                slivers: [
+                  // Peta di atas
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 300,
+                      child: routePoints.isEmpty
+                          ? Container(
+                              color: Colors.grey.shade200,
+                              child: const Center(
+                                child: Icon(Icons.map, color: Colors.grey, size: 60),
                               ),
-                              interactionOptions: const InteractionOptions(
-                                flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                            )
+                          : FlutterMap(
+                              options: MapOptions(
+                                initialCameraFit: CameraFit.bounds(
+                                  bounds: LatLngBounds.fromPoints(routePoints),
+                                  padding: const EdgeInsets.all(40),
+                                ),
+                                interactionOptions: const InteractionOptions(
+                                  flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                                ),
                               ),
-                            ),
-                            children: [
-                              TileLayer(
-                                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                userAgentPackageName: 'com.example.flutter_auth_app',
-                              ),
-                              PolylineLayer(
-                                polylines: [
-                                  Polyline(
-                                    points: routePoints,
-                                    color: Colors.deepOrange, // Matches Strava orange
-                                    strokeWidth: 6,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                    // Back button & icons
-                    SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _actionButton(
-                              icon: Icons.arrow_back_ios_new_rounded,
-                              onTap: () => Navigator.pop(context),
-                            ),
-                            Row(
                               children: [
-                                _actionButton(icon: Icons.bookmark_border_rounded, onTap: () {}),
-                                const SizedBox(width: 12),
-                                _actionButton(
-                                  icon: Icons.more_vert_rounded, 
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                      ),
-                                      builder: (context) {
-                                        return SafeArea(
-                                          child: Wrap(
-                                            children: [
-                                              ListTile(
-                                                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                                                title: const Text('Hapus Aktivitas', style: TextStyle(color: Colors.red)),
-                                                onTap: () async {
-                                                  // Tutup bottom sheet
-                                                  Navigator.pop(context);
-                                                  
-                                                  // Hapus dari database
-                                                  await DatabaseHelper.instance.deleteActivity(activity['id']);
-                                                  
-                                                  // Refresh history state globally
-                                                  if (mounted) {
-                                                    AppState.refreshNotifier.value++;
-                                                    // Tutup halaman detail
-                                                    Navigator.pop(context);
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(content: Text('Aktivitas berhasil dihapus')),
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  }
+                                TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName:
+                                      'com.example.flutter_auth_app',
+                                ),
+                                PolylineLayer(
+                                  polylines: [
+                                    Polyline(
+                                      points: routePoints,
+                                      color: Colors.deepOrange,
+                                      strokeWidth: 5,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Bottom half: Details
-              Expanded(
-                flex: 6,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // User Profile Row
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.purple.shade400,
-                              radius: 24,
-                              child: const Text('M', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Muhammad Yusril musyafak',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.directions_run_rounded, size: 16, color: Colors.black54),
-                                      const SizedBox(width: 6),
-                                      Expanded(
-                                        child: Text(
-                                          '${DateFormat('dd MMMM yyyy pukul HH.mm', 'id_ID').format(date)} · Kediri, East Java',
-                                          style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        
-                        // Title
-                        Text(
-                          '$sportType Pagi',
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black87,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        
-                        // Stats Grid
-                        Row(
-                          children: [
-                            Expanded(child: _detailStatItem('Jarak', '${distanceKm.toStringAsFixed(2)} km')),
-                            Expanded(child: _detailStatItem('Pace Rata2', '${_formatPace(pace)} /km')),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(child: _detailStatItem('Waktu Bergerak', _formatTime(durationSeconds))),
-                            Expanded(child: _detailStatItem('Kenaikan Elevasi', '0 m')),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(child: _detailStatItem('Elevasi Maks', '90 m')),
-                            Expanded(child: const SizedBox()),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
+
+                  // ─── Info Body ───
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // User info row
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundColor: Colors.deepPurple,
+                                child: Text(
+                                  userInitial,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      userName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.directions_run,
+                                            size: 13, color: Colors.black54),
+                                        const SizedBox(width: 4),
+                                        Flexible(
+                                          child: Text(
+                                            '$dateStr · Kediri, East...',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black54,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Judul aktivitas
+                          Text(
+                            '$sportType Pagi',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+                          const Divider(color: Colors.black12),
+                          const SizedBox(height: 12),
+
+                          // Stats Grid — 2 kolom
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _detailStatItem(
+                                  'Jarak',
+                                  '${distanceKm.toStringAsFixed(2)} km',
+                                ),
+                              ),
+                              Expanded(
+                                child: _detailStatItem(
+                                  'Pace Rata2',
+                                  '${_formatPace(pace)} /km',
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _detailStatItem(
+                                  'Waktu Bergerak',
+                                  _formatTime(durationSeconds),
+                                ),
+                              ),
+                              Expanded(
+                                child: _detailStatItem(
+                                  'Kenaikan Elevasi',
+                                  '$elevationGain m',
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          _detailStatItem('Elevasi Maks', '$maxElevation m'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // ─── Tombol Overlay (back, download, more) ───
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _actionButton(
+                        icon: Icons.arrow_back_ios_new_rounded,
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      Row(
+                        children: [
+                          _actionButton(
+                            icon: Icons.download_rounded,
+                            onTap: () async {
+                              // Screenshot dalam tampilan bergaya gelap (Strava-like)
+                              await _captureAndSave(
+                                context,
+                                screenshotController,
+                                routePoints,
+                                sportType,
+                                distanceKm,
+                                durationSeconds,
+                                pace,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 12),
+                          _actionButton(
+                            icon: Icons.more_vert_rounded,
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.vertical(top: Radius.circular(20)),
+                                ),
+                                builder: (context) {
+                                  return SafeArea(
+                                    child: Wrap(
+                                      children: [
+                                        ListTile(
+                                          leading: const Icon(Icons.delete_outline,
+                                              color: Colors.red),
+                                          title: const Text('Hapus Aktivitas',
+                                              style: TextStyle(color: Colors.red)),
+                                          onTap: () async {
+                                            Navigator.pop(context);
+                                            await DatabaseHelper.instance
+                                                .deleteActivity(activity['id']);
+                                            if (mounted) {
+                                              AppState.refreshNotifier.value++;
+                                              Navigator.pop(context);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                    content: Text(
+                                                        'Aktivitas berhasil dihapus')),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Screenshot controller (tidak terlihat, untuk download)
+              Offstage(
+                child: Screenshot(
+                  controller: screenshotController,
+                  child: Container(width: 1, height: 1, color: Colors.transparent),
                 ),
               ),
             ],
@@ -443,6 +517,167 @@ class _HistoryScreenState extends State<HistoryScreen> {
       },
     ));
   }
+
+  /// Tampilkan overlay screenshot bergaya gelap, capture, lalu simpan ke galeri
+  Future<void> _captureAndSave(
+    BuildContext context,
+    ScreenshotController screenshotController,
+    List<LatLng> routePoints,
+    String sportType,
+    double distanceKm,
+    int durationSeconds,
+    double pace,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      // Buat widget screenshot secara off-screen
+      final sc = ScreenshotController();
+      final bytes = await sc.captureFromLongWidget(
+        _buildDownloadWidget(
+          routePoints: routePoints,
+          sportType: sportType,
+          distanceKm: distanceKm,
+          durationSeconds: durationSeconds,
+          pace: pace,
+        ),
+        delay: const Duration(milliseconds: 300),
+      );
+      await Gal.putImageBytes(bytes);
+      if (mounted) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Aktivitas berhasil diunduh ke Galeri')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text('Gagal mengunduh: $e')),
+        );
+      }
+    }
+  }
+
+  /// Widget bergaya Strava gelap — khusus untuk di-screenshot dan disimpan
+  Widget _buildDownloadWidget({
+    required List<LatLng> routePoints,
+    required String sportType,
+    required double distanceKm,
+    required int durationSeconds,
+    required double pace,
+  }) {
+    return SizedBox(
+      width: 390,
+      height: 844,
+      child: Stack(
+        children: [
+          // Map Background
+          Positioned.fill(
+            child: routePoints.isEmpty
+                ? Container(
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                        child: Icon(Icons.map, color: Colors.grey, size: 60)),
+                  )
+                : FlutterMap(
+                    options: MapOptions(
+                      initialCameraFit: CameraFit.bounds(
+                        bounds: LatLngBounds.fromPoints(routePoints),
+                        padding: const EdgeInsets.all(60),
+                      ),
+                      interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.none),
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.example.flutter_auth_app',
+                      ),
+                      PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: routePoints,
+                            color: Colors.deepOrange,
+                            strokeWidth: 6,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+          ),
+          // Gradient + Stats Overlay
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 80, 24, 48),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.5),
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Icon(Icons.directions_run_rounded,
+                          color: Colors.white, size: 36),
+                      Text(
+                        'LATIHAN',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '$sportType Pagi',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _stravaStatItem(
+                              'Pace', '${_formatPace(pace)} /km')),
+                      Expanded(
+                          child: _stravaStatItem(
+                        'Waktu',
+                        durationSeconds >= 3600
+                            ? '${durationSeconds ~/ 3600}j ${(durationSeconds % 3600) ~/ 60}m'
+                            : '${durationSeconds ~/ 60}m ${durationSeconds % 60}d',
+                      )),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  _stravaStatItem('Jarak',
+                      '${distanceKm.toStringAsFixed(2)} km',
+                      isLarge: true),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _actionButton({required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
@@ -461,12 +696,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  Widget _stravaStatItem(String label, String value, {bool isLarge = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: Colors.white70),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: isLarge ? 32 : 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Stat item untuk tampilan detail putih (mirip Strava light mode)
   Widget _detailStatItem(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: Colors.black54)),
-        const SizedBox(height: 6),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 13, color: Colors.black54),
+        ),
+        const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(

@@ -45,6 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (error is! String) {
       // error contains UserModel if success
       AppState.currentUserId = error.id;
+      AppState.currentUserName = error.name;
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
