@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:gal/gal.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
@@ -442,6 +445,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       Row(
                         children: [
                           _actionButton(
+                            icon: Icons.share_rounded,
+                            onTap: () async {
+                              await _shareActivity(
+                                context,
+                                routePoints,
+                                sportType,
+                                distanceKm,
+                                durationSeconds,
+                                pace,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 12),
+                          _actionButton(
                             icon: Icons.download_rounded,
                             onTap: () async {
                               // Screenshot dalam tampilan bergaya gelap (Strava-like)
@@ -518,6 +535,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
         );
       },
     ));
+  }
+
+  /// Bagikan gambar ke aplikasi lain
+  Future<void> _shareActivity(
+    BuildContext context,
+    List<LatLng> routePoints,
+    String sportType,
+    double distanceKm,
+    int durationSeconds,
+    double pace,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final sc = ScreenshotController();
+      final bytes = await sc.captureFromWidget(
+        _buildDownloadWidget(
+          routePoints: routePoints,
+          sportType: sportType,
+          distanceKm: distanceKm,
+          durationSeconds: durationSeconds,
+          pace: pace,
+        ),
+        pixelRatio: 3.0,
+      );
+      
+      final directory = await getTemporaryDirectory();
+      final imagePath = await File('${directory.path}/activity_share.png').create();
+      await imagePath.writeAsBytes(bytes);
+
+      await Share.shareXFiles([XFile(imagePath.path)], text: 'Lihat aktivitas $sportType saya!');
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text('Gagal membagikan: $e')),
+        );
+      }
+    }
   }
 
   /// Capture dan simpan gambar ke galeri — gunakan CustomPainter (tanpa network)
