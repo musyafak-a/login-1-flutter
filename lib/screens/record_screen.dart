@@ -261,7 +261,7 @@ class _RecordScreenState extends State<RecordScreen> {
     // Gunakan posisi perangkat jika sudah didapat, atau fallback ke dunia tengah
     final initialCenter = _currentPosition ?? const LatLng(0, 0);
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       child: Stack(
         children: [
           FlutterMap(

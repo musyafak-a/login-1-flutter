@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../widgets/gradient_curve_header.dart';
 import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
+import '../widgets/grainy_background.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -57,34 +57,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GradientCurveHeader(
-              height: 220,
-              showBackButton: true,
-              onBack: () => Navigator.pushReplacementNamed(context, '/login'),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Create account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+      backgroundColor: Colors.transparent,
+      body: GrainyBackground(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tombol kembali khusus untuk register
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 16),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                   ),
-                  const SizedBox(height: 8),
+                ),
+              ),
+              const SizedBox(height: 60),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Create account',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                   Row(
                     children: [
                       const Text(
                         'Already have an account? ',
-                        style: TextStyle(color: Colors.black54, fontSize: 13),
+                        style: TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pushReplacementNamed(
@@ -92,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: const Text(
                           'sign in',
                           style: TextStyle(
-                            color: AppColors.primary,
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -145,6 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

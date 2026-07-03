@@ -84,7 +84,7 @@ class _StatistikScreenState extends State<StatistikScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       child: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadData,
@@ -99,13 +99,13 @@ class _StatistikScreenState extends State<StatistikScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Pantau perkembangan larimu',
-                  style: TextStyle(color: Colors.black54, fontSize: 13),
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
                 ),
                 const SizedBox(height: 24),
                 _buildWeeklyChartCard(),

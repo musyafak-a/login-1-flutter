@@ -4,6 +4,7 @@ import 'record_screen.dart';
 import 'history_screen.dart';
 import 'statistik_screen.dart';
 import '../widgets/app_bottom_nav.dart';
+import '../widgets/grainy_background.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -25,9 +26,11 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
+      body: GrainyBackground(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: _currentIndex,

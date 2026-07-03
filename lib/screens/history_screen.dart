@@ -68,7 +68,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +80,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -91,7 +91,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ? const Center(
                           child: Text(
                             'Belum ada riwayat',
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(color: Colors.white70),
                           ),
                         )
                       : ListView.builder(

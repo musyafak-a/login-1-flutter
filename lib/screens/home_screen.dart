@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/gradient_curve_header.dart';
 import '../theme/app_colors.dart';
 
 import '../database/database_helper.dart';
@@ -51,10 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       child: Column(
         children: [
-          const GradientCurveHeader(height: 260),
+          const SizedBox(height: 60), // Space for header
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -66,13 +65,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Selamat datang kembali, siap lari hari ini?',
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
                   if (_isLoading)
@@ -132,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 40,
             width: 1,
-            color: Colors.black12,
+            color: Colors.white24,
           ),
           _buildOverviewItem(
             icon: Icons.local_fire_department_rounded,
@@ -143,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 40,
             width: 1,
-            color: Colors.black12,
+            color: Colors.white24,
           ),
           _buildOverviewItem(
             icon: Icons.favorite_rounded,
@@ -169,9 +168,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           value,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 4),
@@ -180,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 11,
-            color: Colors.black54,
+            color: Colors.white70,
             height: 1.2,
           ),
         ),
