@@ -25,16 +25,18 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GrainyBackground(
-        child: IndexedStack(
+    return GrainyBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBody: true, // Membuat konten utama memanjang hingga ke bawah navigasi
+        body: IndexedStack(
           index: _currentIndex,
           children: _pages,
         ),
-      ),
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        bottomNavigationBar: AppBottomNav(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+        ),
       ),
     );
   }

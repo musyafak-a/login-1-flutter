@@ -139,8 +139,9 @@ class _StatistikScreenState extends State<StatistikScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +272,8 @@ class _StatistikScreenState extends State<StatistikScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
+        color: Colors.white.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.white, width: 1.5),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(

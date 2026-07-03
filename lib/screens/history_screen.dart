@@ -126,20 +126,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return GestureDetector(
       onTap: () => _showHistoryDetail(activity, routePoints),
       child: Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+        margin: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.all(2), // Ketebalan border gradasi
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.gradGreen.withValues(alpha: 0.6),
+              AppColors.gradYellow.withValues(alpha: 0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Column(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Peta Statis
@@ -218,7 +230,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
     ),
-  );
+  ),
+);
 }
 
   Widget _statItem(String label, String value) {

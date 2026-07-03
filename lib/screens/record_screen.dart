@@ -131,7 +131,7 @@ class _RecordScreenState extends State<RecordScreen> {
 
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,   // pakai mode akurasi tinggi (GPS, bukan cuma wifi/cell tower)
-      distanceFilter: 3,                 // update posisi tiap pergerakan ≥ 3 meter
+      distanceFilter: 0,                 // update posisi setiap saat (0 meter) agar mudah dites
     );
 
     _positionStream =
@@ -168,8 +168,8 @@ class _RecordScreenState extends State<RecordScreen> {
 
     final distanceKm = _distanceMeters / 1000;
 
-    // Minimum jarak untuk disimpan: 2 meter (0.002 km)
-    if (distanceKm > 0.002) {
+    // Simpan jika durasi minimal 2 detik (agar mudah dites)
+    if (_elapsedSeconds >= 2) {
       final userId = AppState.currentUserId ?? 0;
       
       // Serialize route points
