@@ -205,6 +205,38 @@ class _RecordScreenState extends State<RecordScreen> {
     });
   }
 
+  void _discardRecord() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Aktivitas?'),
+        content: const Text('Aktivitas yang sedang direkam tidak akan disimpan.'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal', style: TextStyle(color: Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _positionStream?.cancel();
+              _timer?.cancel();
+              setState(() {
+                _state = _RunState.idle;
+                _routePoints.clear();
+                _distanceMeters = 0;
+                _elapsedSeconds = 0;
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _formatTime(int seconds) {
     final h = seconds ~/ 3600;
     final m = (seconds % 3600) ~/ 60;
@@ -318,7 +350,7 @@ class _RecordScreenState extends State<RecordScreen> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -415,6 +447,24 @@ class _RecordScreenState extends State<RecordScreen> {
 
     return Row(
       children: [
+        if (_state == _RunState.paused) ...[
+          SizedBox(
+            height: 52,
+            width: 52,
+            child: OutlinedButton(
+              onPressed: _discardRecord,
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                side: const BorderSide(color: Colors.red),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(26),
+                ),
+              ),
+              child: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
         Expanded(
           child: SizedBox(
             height: 52,
@@ -489,7 +539,7 @@ class _RecordScreenState extends State<RecordScreen> {
             height: 36,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
             child: DropdownButton<String>(
