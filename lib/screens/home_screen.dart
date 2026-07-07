@@ -54,25 +54,39 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.transparent,
         child: Column(
           children: [
-            const SizedBox(height: 60), // Space for header
+            const SizedBox(height: 20), // Reduced space to move profile up
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Welcome 👋',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Selamat datang kembali, siap lari hari ini?',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white24,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppState.currentUserName ?? 'User',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const Text(
+                              'Siap lari hari ini?',
+                              style: TextStyle(color: Colors.white70, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     if (_isLoading)

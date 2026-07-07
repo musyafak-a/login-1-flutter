@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'Run Tracker',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Roboto',
+        fontFamily: 'Helvetica',
         scaffoldBackgroundColor: AppColors.background,
         primaryColor: AppColors.primary,
         useMaterial3: true,
