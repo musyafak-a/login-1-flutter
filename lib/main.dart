@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/main_shell.dart';
+import 'screens/splash_screen.dart';
 import 'theme/app_colors.dart';
 
 void main() async {
@@ -25,8 +26,9 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         useMaterial3: true,
       ),
-      initialRoute: '/login',
+      initialRoute: '/splash',
       routes: {
+        '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const MainShell(),
