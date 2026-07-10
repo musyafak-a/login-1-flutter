@@ -24,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
@@ -67,6 +67,10 @@ class DatabaseHelper {
         }
         if (oldVersion < 5) {
           await db.execute("ALTER TABLE activities ADD COLUMN route TEXT NOT NULL DEFAULT '[]'");
+        }
+        if (oldVersion < 6) {
+          await db.execute("ALTER TABLE users ADD COLUMN photo TEXT");
+          await db.execute("ALTER TABLE users ADD COLUMN asal TEXT");
         }
       },
     );
@@ -134,6 +138,29 @@ class DatabaseHelper {
       return UserModel.fromMap(result.first);
     }
     return null;
+  }
+
+  Future<UserModel?> getUserById(int id) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (result.isNotEmpty) {
+      return UserModel.fromMap(result.first);
+    }
+    return null;
+  }
+
+  Future<void> updateUser(UserModel user) async {
+    final db = await database;
+    await db.update(
+      'users',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
   }
 
   Future<void> close() async {

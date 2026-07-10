@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
+import '../models/user_model.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   double _totalKm = 0.0;
   double _bestEffortKm = 0.0;
   bool _isLoading = true;
+  UserModel? _currentUser;
 
   @override
   void initState() {
@@ -28,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userId = AppState.currentUserId ?? 0;
     final weekly = await DatabaseHelper.instance.getWeeklyStats(userId, DateTime.now());
     final allActivities = await DatabaseHelper.instance.getAllActivitiesWithRoute(userId);
+    final user = await DatabaseHelper.instance.getUserById(userId);
 
     double totalKm = 0;
     double bestKm = 0;
@@ -48,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (mounted) {
       setState(() {
+        _currentUser = user;
         _weeklyStats = weekly;
         _totalKm = totalKm;
         _bestEffortKm = bestKm;
@@ -92,7 +98,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       CircleAvatar(
                         radius: 40,
                         backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-                        child: const Icon(Icons.person, color: AppColors.primary, size: 40),
+                        backgroundImage: _currentUser?.photo != null
+                            ? FileImage(File(_currentUser!.photo!))
+                            : null,
+                        child: _currentUser?.photo == null
+                            ? const Icon(Icons.person, color: AppColors.primary, size: 40)
+                            : null,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -108,16 +119,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'Indonesia', // Lokasi
-                              style: TextStyle(color: Colors.black54, fontSize: 14),
+                            Text(
+                              _currentUser?.asal?.isNotEmpty == true
+                                  ? _currentUser!.asal!
+                                  : 'Indonesia', // Lokasi
+                              style: const TextStyle(color: Colors.black54, fontSize: 14),
                             ),
                           ],
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          // Todo: edit profile action
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                          );
+                          if (result == true) {
+                            _loadData();
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryLight.withOpacity(0.2),

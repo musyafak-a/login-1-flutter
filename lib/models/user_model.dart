@@ -3,12 +3,15 @@ class UserModel {
   final String name;
   final String emailOrPhone;
   final String passwordHash;
-
+  final String? photo;
+  final String? asal;
   UserModel({
     this.id,
     required this.name,
     required this.emailOrPhone,
     required this.passwordHash,
+    this.photo,
+    this.asal,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +20,8 @@ class UserModel {
       'name': name,
       'emailOrPhone': emailOrPhone,
       'passwordHash': passwordHash,
+      'photo': photo,
+      'asal': asal,
     };
   }
 
@@ -26,6 +31,8 @@ class UserModel {
       name: map['name'] as String,
       emailOrPhone: map['emailOrPhone'] as String,
       passwordHash: map['passwordHash'] as String,
+      photo: map['photo'] as String?,
+      asal: map['asal'] as String?,
     );
   }
 }
