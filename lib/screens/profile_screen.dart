@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
-import '../widgets/grainy_background.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -66,132 +65,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GrainyBackground(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: const Text(
-            'Profile',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.primaryDark),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    // Foto, Nama, Lokasi, Edit
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          child: const Icon(Icons.person, color: Colors.white, size: 40),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppState.currentUserName ?? 'User',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Indonesia', // Lokasi
-                                style: TextStyle(color: Colors.white70, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Todo: edit profile action
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.2),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: const Text('Edit'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Grafik minggu ini
-                    _buildWeeklyChartCard(),
-                    const SizedBox(height: 24),
-
-                    // Aktivitas (tanggal terakhir)
-                    _buildStatRow(Icons.calendar_today, 'Aktivitas Terakhir', _lastActivityDate),
-                    const Divider(height: 32, color: Colors.white24),
-
-                    // Statistik (total km)
-                    _buildStatRow(Icons.directions_run, 'Total Jarak', '${_totalKm.toStringAsFixed(2)} km'),
-                    const Divider(height: 32, color: Colors.white24),
-
-                    // Best effort
-                    _buildStatRow(Icons.emoji_events, 'Best Effort', '${_bestEffortKm.toStringAsFixed(2)} km'),
-                    const SizedBox(height: 40),
-                    
-                    // Logout button (dibawah sendiri)
-                    Container(
-                      width: double.infinity,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(26),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.redAccent.withValues(alpha: 0.6),
-                            Colors.orangeAccent.withValues(alpha: 0.6),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(2), // Ketebalan border tipis
-                      child: ElevatedButton.icon(
-                        onPressed: () => _logout(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          elevation: 0,
-                        ),
-                        icon: const Icon(Icons.logout, color: Colors.white),
-                        label: const Text(
-                          'Log out',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  // Foto, Nama, Lokasi, Edit
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                        child: const Icon(Icons.person, color: AppColors.primary, size: 40),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppState.currentUserName ?? 'User',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryDark,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Indonesia', // Lokasi
+                              style: TextStyle(color: Colors.black54, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Todo: edit profile action
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+                          foregroundColor: AppColors.primaryDark,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text('Edit'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Grafik minggu ini
+                  _buildWeeklyChartCard(),
+                  const SizedBox(height: 24),
+
+                  // Aktivitas (tanggal terakhir)
+                  _buildStatRow(Icons.calendar_today, 'Aktivitas Terakhir', _lastActivityDate),
+                  const Divider(height: 32, color: Colors.black12),
+
+                  // Statistik (total km)
+                  _buildStatRow(Icons.directions_run, 'Total Jarak', '${_totalKm.toStringAsFixed(2)} km'),
+                  const Divider(height: 32, color: Colors.black12),
+
+                  // Best effort
+                  _buildStatRow(Icons.emoji_events, 'Best Effort', '${_bestEffortKm.toStringAsFixed(2)} km'),
+                  const SizedBox(height: 40),
+                  
+                  // Logout button (dibawah sendiri)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _logout(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.redAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          side: const BorderSide(color: Colors.redAccent, width: 1.5),
+                        ),
+                        elevation: 0,
+                      ),
+                      icon: const Icon(Icons.logout),
+                      label: const Text(
+                        'Log out',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
     );
   }
 
@@ -201,20 +187,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: AppColors.primaryLight.withOpacity(0.2),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
+          child: Icon(icon, color: AppColors.primary, size: 24),
         ),
         const SizedBox(width: 16),
         Text(
           title,
-          style: const TextStyle(fontSize: 16, color: Colors.white70),
+          style: const TextStyle(fontSize: 16, color: Colors.black87),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
         ),
       ],
     );
@@ -232,16 +218,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 1.5),
+        border: Border.all(color: Colors.black12, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'Grafik Minggu Ini',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.primaryDark),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -262,15 +255,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text(
                           value == 0 ? '' : value.toStringAsFixed(1),
-                          style: const TextStyle(fontSize: 10, color: Colors.white70),
+                          style: const TextStyle(fontSize: 10, color: Colors.black54),
                         ),
                         const SizedBox(height: 4),
                         Container(
                           height: 90 * heightRatio.clamp(0.03, 1.0),
                           decoration: BoxDecoration(
                             color: isToday
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.4),
+                                ? AppColors.primary
+                                : AppColors.primaryLight.withOpacity(0.4),
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
@@ -280,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                            color: isToday ? Colors.white : Colors.white70,
+                            color: isToday ? AppColors.primaryDark : Colors.black54,
                           ),
                         ),
                       ],
