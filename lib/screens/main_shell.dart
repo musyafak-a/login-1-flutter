@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import '../database/database_helper.dart';
 import 'home_screen.dart';
 import 'record_screen.dart';
 import 'history_screen.dart';
@@ -18,6 +20,7 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  String? _photoPath;
 
   final List<Widget> _pages = const [
     HomeScreen(),
@@ -25,6 +28,31 @@ class _MainShellState extends State<MainShell> {
     HistoryScreen(),
     StatistikScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+    AppState.refreshNotifier.addListener(_loadUser);
+  }
+
+  @override
+  void dispose() {
+    AppState.refreshNotifier.removeListener(_loadUser);
+    super.dispose();
+  }
+
+  Future<void> _loadUser() async {
+    final userId = AppState.currentUserId;
+    if (userId != null) {
+      final user = await DatabaseHelper.instance.getUserById(userId);
+      if (mounted) {
+        setState(() {
+          _photoPath = user?.photo;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +92,8 @@ class _MainShellState extends State<MainShell> {
             child: CircleAvatar(
               radius: 22,
               backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-              child: const Icon(Icons.person, color: AppColors.primary),
+              backgroundImage: _photoPath != null ? FileImage(File(_photoPath!)) : null,
+              child: _photoPath == null ? const Icon(Icons.person, color: AppColors.primary) : null,
             ),
           ),
           const SizedBox(width: 12),
