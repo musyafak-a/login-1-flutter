@@ -107,7 +107,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final position = await Geolocator.getCurrentPosition();
-      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placemarks = await Geocoding().placemarkFromCoordinates(position.latitude, position.longitude);
       
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
