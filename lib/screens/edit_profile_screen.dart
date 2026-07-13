@@ -5,6 +5,8 @@ import '../database/database_helper.dart';
 import '../models/user_model.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -58,6 +60,76 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         _photoPath = image.path;
       });
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Layanan lokasi tidak aktif')),
+        );
+      }
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Izin lokasi ditolak')),
+          );
+        }
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Izin lokasi ditolak permanen')),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Mencari lokasi terkini...')),
+      );
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final city = place.subAdministrativeArea ?? place.locality ?? place.administrativeArea ?? '';
+        final state = place.administrativeArea ?? '';
+        
+        final locationStr = [city, state].where((e) => e.isNotEmpty).join(', ');
+        
+        if (mounted) {
+          setState(() {
+            _asalController.text = locationStr;
+          });
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mendapatkan lokasi: $e')),
+        );
+      }
     }
   }
 
@@ -173,6 +245,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       controller: _asalController,
                       label: 'Asal / Lokasi',
                       icon: Icons.location_on_outlined,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.my_location, color: AppColors.primary),
+                        onPressed: _getCurrentLocation,
+                        tooltip: 'Lacak Lokasi',
+                      ),
                     ),
                     const SizedBox(height: 40),
                     
@@ -210,6 +287,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String label,
     required IconData icon,
     String? Function(String?)? validator,
+    Widget? suffixIcon,
   }) {
     return TextFormField(
       controller: controller,
@@ -219,6 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.black54),
         prefixIcon: Icon(icon, color: AppColors.primary),
+        suffixIcon: suffixIcon,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.grey.shade300),

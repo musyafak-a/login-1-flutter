@@ -22,6 +22,7 @@ dependencies:
   share_plus: ^13.2.0
   path_provider: ^2.1.6
   image_picker: ^1.2.3
+  geocoding: ^5.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
