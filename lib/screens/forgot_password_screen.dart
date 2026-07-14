@@ -4,6 +4,8 @@ import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../widgets/grainy_background.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -37,24 +39,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = false);
 
     if (user != null) {
-      // Simulate sending code
       _userId = user.id;
       _generatedCode = (100000 + Random().nextInt(900000)).toString(); // 6 digit code
-      
-      // Show code in snackbar for demo purposes
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Kode Verifikasi (DEMO): $_generatedCode'),
-            duration: const Duration(seconds: 10),
-            backgroundColor: Colors.green.shade800,
-          ),
-        );
-      }
 
-      setState(() {
-        _step = 2;
-      });
+      // SMTP Configuration (Ganti dengan email & app password Anda)
+      String username = 'email_anda@gmail.com'; // TODO: Ganti dengan Gmail Anda
+      String password = 'password_app_anda';    // TODO: Ganti dengan App Password Gmail Anda
+
+      final smtpServer = gmail(username, password);
+      
+      final message = Message()
+        ..from = Address(username, 'Run Tracker App')
+        ..recipients.add(email)
+        ..subject = 'Kode Verifikasi Lupa Password'
+        ..html = "<h3>Kode verifikasi Anda adalah: <b>$_generatedCode</b></h3>\n<p>Jangan berikan kode ini kepada siapapun.</p>";
+
+      try {
+        await send(message, smtpServer);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kode Verifikasi telah dikirim ke email Anda'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          setState(() {
+            _step = 2;
+          });
+        }
+      } on MailerException catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal mengirim email. Pastikan SMTP dikonfigurasi. (Demo Kode: $_generatedCode)'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          // Tetap lanjut ke step 2 agar bisa dicoba walau email gagal
+          setState(() {
+            _step = 2;
+          });
+        }
+      }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
