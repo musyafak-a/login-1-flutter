@@ -153,6 +153,30 @@ class DatabaseHelper {
     return null;
   }
 
+  Future<UserModel?> getUserByEmailOrPhone(String emailOrPhone) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'emailOrPhone = ?',
+      whereArgs: [emailOrPhone],
+    );
+    if (result.isNotEmpty) {
+      return UserModel.fromMap(result.first);
+    }
+    return null;
+  }
+
+  Future<void> updatePassword(int userId, String newPassword) async {
+    final db = await database;
+    final hashed = hashPassword(newPassword);
+    await db.update(
+      'users',
+      {'passwordHash': hashed},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+  }
+
   Future<void> updateUser(UserModel user) async {
     final db = await database;
     await db.update(

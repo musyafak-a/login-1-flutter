@@ -111,10 +111,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
-        final city = place.subAdministrativeArea ?? place.locality ?? place.administrativeArea ?? '';
-        final state = place.administrativeArea ?? '';
+        final kecamatan = place.locality ?? '';
+        final kota = place.subAdministrativeArea ?? '';
+        final provinsi = place.administrativeArea ?? '';
         
-        final locationStr = [city, state].where((e) => e.isNotEmpty).join(', ');
+        final locationStr = [kecamatan, kota, provinsi]
+            .where((e) => e.isNotEmpty)
+            .toSet()
+            .join(', ');
         
         if (mounted) {
           setState(() {
