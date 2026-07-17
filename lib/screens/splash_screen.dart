@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../widgets/grainy_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,73 +21,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Gradient Hijau tipis di kanan atas
-          Positioned(
-            top: -150,
-            right: -100,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.gradGreen.withValues(alpha: 0.3),
-                    AppColors.gradGreen.withValues(alpha: 0.0),
-                  ],
-                  stops: const [0.2, 1.0],
-                ),
-              ),
+    return GrainyBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24.0), // sedikit border radius
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 160,
+              height: 160,
+              fit: BoxFit.cover,
             ),
           ),
-          // Gradient Kuning tipis di kiri bawah
-          Positioned(
-            bottom: -150,
-            left: -100,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.gradYellow.withValues(alpha: 0.3),
-                    AppColors.gradYellow.withValues(alpha: 0.0),
-                  ],
-                  stops: const [0.2, 1.0],
-                ),
-              ),
-            ),
-          ),
-          // Texture grain (noise)
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/noise.png'),
-                repeat: ImageRepeat.repeat,
-                fit: BoxFit.none,
-                opacity: 0.25,
-              ),
-            ),
-          ),
-          // Logo aplikasi di tengah
-          Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24.0), // sedikit border radius
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 160,
-                height: 160,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

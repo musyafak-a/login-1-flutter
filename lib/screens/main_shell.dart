@@ -7,7 +7,7 @@ import 'history_screen.dart';
 import 'profile_screen.dart';
 import 'statistik_screen.dart';
 import '../widgets/app_bottom_nav.dart';
-import '../widgets/grainy_background.dart';
+import '../widgets/light_grainy_background.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
 
@@ -56,7 +56,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    return GrainyBackground(
+    return LightGrainyBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: _buildAppBar(),
@@ -76,7 +76,7 @@ class _MainShellState extends State<MainShell> {
   PreferredSizeWidget? _buildAppBar() {
     if (_currentIndex == 1) return null; // No appbar on RecordScreen
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.yellow,
       elevation: 0,
       automaticallyImplyLeading: false,
       toolbarHeight: 70, // Beri ruang sedikit lebih lega

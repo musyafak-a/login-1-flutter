@@ -4,7 +4,7 @@ import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
 
-import '../widgets/grainy_background.dart';
+import '../widgets/light_grainy_background.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,9 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GrainyBackground(
+    return LightGrainyBackground(
       child: Scaffold(
-        backgroundColor: Colors.transparent, // Transparan agar terlihat GrainyBackground
+        backgroundColor: Colors.transparent, // Transparan agar terlihat LightGrainyBackground
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text(
                         "Don't have an account? ",
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: Colors.black54, fontSize: 13),
                       ),
                       GestureDetector(
                         onTap: () =>
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text(
                           'sign up',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black87,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Lupa Password?',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black87,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),

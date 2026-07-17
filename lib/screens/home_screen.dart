@@ -81,9 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white, width: 1.5),
+        border: Border.all(color: Colors.black12, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 40,
             width: 1,
-            color: Colors.white24,
+            color: Colors.black12,
           ),
           _buildOverviewItem(
             icon: Icons.local_fire_department_rounded,
@@ -107,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 40,
             width: 1,
-            color: Colors.white24,
+            color: Colors.black12,
           ),
           _buildOverviewItem(
             icon: Icons.favorite_rounded,
@@ -135,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 4),
@@ -144,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 11,
-            color: Colors.white70,
+            color: Colors.black54,
             height: 1.2,
           ),
         ),

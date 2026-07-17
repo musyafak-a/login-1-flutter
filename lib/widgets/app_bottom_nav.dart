@@ -24,7 +24,7 @@ class AppBottomNav extends StatelessWidget {
           top: 20,
           child: Container(
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: Colors.yellow,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black12,

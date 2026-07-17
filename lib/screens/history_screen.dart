@@ -80,7 +80,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black87,
                 ),
               ),
             ),
@@ -91,7 +91,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ? const Center(
                           child: Text(
                             'Belum ada riwayat',
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Colors.black54),
                           ),
                         )
                       : ListView.builder(

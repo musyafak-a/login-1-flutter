@@ -99,13 +99,13 @@ class _StatistikScreenState extends State<StatistikScreen> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Pantau perkembangan larimu',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(color: Colors.black54, fontSize: 13),
                 ),
                 const SizedBox(height: 24),
                 _buildWeeklyChartCard(),
@@ -139,9 +139,16 @@ class _StatistikScreenState extends State<StatistikScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 1.5),
+        border: Border.all(color: Colors.black12, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,9 +279,16 @@ class _StatistikScreenState extends State<StatistikScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        border: Border.all(color: Colors.white, width: 1.5),
+        color: Colors.white,
+        border: Border.all(color: Colors.black12, width: 1.5),
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
