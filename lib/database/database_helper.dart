@@ -24,14 +24,16 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             emailOrPhone TEXT NOT NULL UNIQUE,
-            passwordHash TEXT NOT NULL
+            passwordHash TEXT NOT NULL,
+            photo TEXT,
+            asal TEXT
           )
         ''');
         await db.execute('''
@@ -69,8 +71,12 @@ class DatabaseHelper {
           await db.execute("ALTER TABLE activities ADD COLUMN route TEXT NOT NULL DEFAULT '[]'");
         }
         if (oldVersion < 6) {
-          await db.execute("ALTER TABLE users ADD COLUMN photo TEXT");
-          await db.execute("ALTER TABLE users ADD COLUMN asal TEXT");
+          try { await db.execute("ALTER TABLE users ADD COLUMN photo TEXT"); } catch (_) {}
+          try { await db.execute("ALTER TABLE users ADD COLUMN asal TEXT"); } catch (_) {}
+        }
+        if (oldVersion < 7) {
+          try { await db.execute("ALTER TABLE users ADD COLUMN photo TEXT"); } catch (_) {}
+          try { await db.execute("ALTER TABLE users ADD COLUMN asal TEXT"); } catch (_) {}
         }
       },
     );

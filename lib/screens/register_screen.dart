@@ -33,12 +33,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     setState(() => _isLoading = true);
-    final error = await DatabaseHelper.instance.registerUser(
-      name: name,
-      emailOrPhone: emailOrPhone,
-      password: password,
-    );
-    setState(() => _isLoading = false);
+    dynamic error;
+    try {
+      error = await DatabaseHelper.instance.registerUser(
+        name: name,
+        emailOrPhone: emailOrPhone,
+        password: password,
+      );
+    } catch (e) {
+      error = 'Terjadi kesalahan sistem: $e';
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
 
     if (!mounted) return;
 
