@@ -76,7 +76,7 @@ class _MainShellState extends State<MainShell> {
   PreferredSizeWidget? _buildAppBar() {
     if (_currentIndex == 1) return null; // No appbar on RecordScreen
     return AppBar(
-      backgroundColor: Colors.yellow,
+      backgroundColor: AppColors.primary,
       elevation: 0,
       automaticallyImplyLeading: false,
       toolbarHeight: 70, // Beri ruang sedikit lebih lega
@@ -106,12 +106,12 @@ class _MainShellState extends State<MainShell> {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+                  color: Colors.white,
                 ),
               ),
               const Text(
                 'Siap lari hari ini?',
-                style: TextStyle(color: Colors.black54, fontSize: 13),
+                style: TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ],
           ),

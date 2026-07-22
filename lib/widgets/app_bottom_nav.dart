@@ -24,7 +24,7 @@ class AppBottomNav extends StatelessWidget {
           top: 20,
           child: Container(
             decoration: const BoxDecoration(
-              color: Colors.yellow,
+              color: AppColors.primary,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black12,
@@ -60,11 +60,11 @@ class AppBottomNav extends StatelessWidget {
                         height: circleSize,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.primary,
+                          color: Colors.yellow,
                           border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.4),
+                              color: Colors.yellow.withValues(alpha: 0.4),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             )
@@ -121,7 +121,7 @@ class AppBottomNav extends StatelessWidget {
                   duration: const Duration(milliseconds: 350),
                   curve: Curves.easeOutCubic,
                   builder: (context, t, child) {
-                    final color = Color.lerp(Colors.grey.shade400, Colors.white, t);
+                    final color = Color.lerp(Colors.white70, AppColors.primaryDark, t);
                     final size = 26.0 + (2.0 * t); // membesar sedikit dari 26 ke 28
                     return Icon(icon, color: color, size: size);
                   },
@@ -137,8 +137,8 @@ class AppBottomNav extends StatelessWidget {
                   opacity: isActive ? 0.0 : 1.0,
                   child: Text(
                     label,
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
+                    style: const TextStyle(
+                      color: Colors.white70,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                     ),

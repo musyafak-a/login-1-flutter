@@ -3,7 +3,7 @@ import '../widgets/app_widgets.dart';
 import '../database/database_helper.dart';
 import '../theme/app_colors.dart';
 import '../state/app_state.dart';
-import '../widgets/grainy_background.dart';
+import '../widgets/light_grainy_background.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -64,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GrainyBackground(
+    return LightGrainyBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
@@ -76,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16, top: 16),
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87),
                     onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                   ),
                 ),
@@ -92,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       const Text(
                         'Already have an account? ',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
+                        style: TextStyle(color: Colors.black54, fontSize: 13),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pushReplacementNamed(
@@ -108,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: const Text(
                           'sign in',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black87,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
