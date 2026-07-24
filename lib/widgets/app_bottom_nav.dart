@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
@@ -22,16 +23,22 @@ class AppBottomNav extends StatelessWidget {
           left: 0,
           right: 0,
           top: 20,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 12,
-                  offset: Offset(0, -2),
-                )
-              ],
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.75),
+                  border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.2))),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 12,
+                      offset: Offset(0, -2),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import 'home_screen.dart';
@@ -59,6 +60,7 @@ class _MainShellState extends State<MainShell> {
     return LightGrainyBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
         appBar: _buildAppBar(),
         extendBody: true, // Membuat konten utama memanjang hingga ke bawah navigasi
         body: IndexedStack(
@@ -76,8 +78,14 @@ class _MainShellState extends State<MainShell> {
   PreferredSizeWidget? _buildAppBar() {
     if (_currentIndex == 1) return null; // No appbar on RecordScreen
     return AppBar(
-      backgroundColor: AppColors.gradYellow,
+      backgroundColor: AppColors.gradYellow.withValues(alpha: 0.75),
       elevation: 0,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: Colors.transparent),
+        ),
+      ),
       automaticallyImplyLeading: false,
       toolbarHeight: 70, // Beri ruang sedikit lebih lega
       title: Row(
